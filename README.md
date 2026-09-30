@@ -30,6 +30,26 @@ npm run dev                  # http://localhost:3000
 
 The service-role key must never appear here, in any `NEXT_PUBLIC_*` variable, or in git.
 
+## Connecting to the phone
+
+There is no pairing, webhook, or sync service. The phone and this site sign into the same Supabase project, so both read the same `garment_list` and `parameter_catalog`.
+
+| Phone `.env` | Dashboard `.env.local` |
+|---|---|
+| `EXPO_PUBLIC_SUPABASE_URL` | `NEXT_PUBLIC_SUPABASE_URL` |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| `EXPO_PUBLIC_AUTH_LOGIN_MODE` | `NEXT_PUBLIC_AUTH_LOGIN_MODE` |
+| `EXPO_PUBLIC_AUTH_ALIAS_EMAIL_DOMAIN` | `NEXT_PUBLIC_AUTH_ALIAS_EMAIL_DOMAIN` |
+
+Sign in with the same mobile and password as the phone. In the default `email_alias` mode, `9876543210` is sent as `919876543210@phone.sculpt.studio`.
+
+To confirm the link:
+
+1. Run the phone against live Supabase (`just start-live`), not the MSW mock.
+2. Sign in on the dashboard. `/garments` should match the phone's Archive.
+3. Add a Spec and an option on `/specs`.
+4. On the phone, leave Add Garment (or Specs) and open it again so it refetches `parameter_catalog`. The new Spec and option appear there.
+
 ## Scripts
 
 | Command | What it does |

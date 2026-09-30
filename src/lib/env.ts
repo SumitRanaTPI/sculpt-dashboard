@@ -9,9 +9,9 @@ export type LoginMode = "email_alias" | "phone";
 export const env = {
   supabaseUrl: rawUrl.replace(/\/+$/, ""),
   anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
-  loginMode: (rawMode === "phone" ? "phone" : "email_alias") as LoginMode,
+  loginMode: (rawMode?.trim() === "phone" ? "phone" : "email_alias") as LoginMode,
   aliasEmailDomain:
-    process.env.NEXT_PUBLIC_AUTH_ALIAS_EMAIL_DOMAIN?.trim() || "phone.sculpt.studio",
+    process.env.NEXT_PUBLIC_AUTH_ALIAS_EMAIL_DOMAIN?.trim().toLowerCase() || "phone.sculpt.studio",
 } as const;
 
 export function envProblems(): string[] {
