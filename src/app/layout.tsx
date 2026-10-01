@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: { default: "SCULPT Studio", template: "%s · SCULPT Studio" },
   description: "Studio dashboard for SCULPT garments and Specs.",
   robots: { index: false, follow: false },
+  icons: { icon: "/logo.jpg", apple: "/logo.jpg" },
 };
 
 export const viewport: Viewport = {

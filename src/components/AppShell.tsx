@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { Logo } from "@/components/Logo";
 import { initialsOf, useProfile } from "@/components/ProfileProvider";
 
 const NAV = [
@@ -27,7 +28,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="topbar">
         <div className="topbar__inner">
           <Link href="/" className="brand">
-            Sculpt<span>.</span>
+            <Logo size={32} />
+            <span className="brand__word">
+              Sculpt<span>.</span>
+            </span>
           </Link>
           <nav className="nav" aria-label="Studio">
             {NAV.map((item) => (
