@@ -1,15 +1,14 @@
 /**
- * Studio mark. The source image has a soft glow around a dark rounded
- * square, so it is cropped slightly inside a rounded frame.
+ * Studio wordmark. The source is a wide lockup, so height is set and
+ * width follows the image.
  */
-export function Logo({ size = 34, className }: { size?: number; className?: string }) {
+export function Logo({ height = 28, className }: { height?: number; className?: string }) {
   return (
-    <span
+    <img
       className={["logo", className].filter(Boolean).join(" ")}
-      style={{ width: size, height: size, borderRadius: Math.round(size * 0.22) }}
-      aria-hidden="true"
-    >
-      <img src="/logo.jpg" alt="" width={size} height={size} />
-    </span>
+      src="/logo.png"
+      alt="SCULPT"
+      style={{ height }}
+    />
   );
 }

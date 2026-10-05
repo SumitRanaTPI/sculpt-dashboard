@@ -49,12 +49,7 @@ export default function SignInPage() {
     <div className="signin">
       <div className="card signin__card">
         <div className="signin__logo">
-          <Logo size={72} />
-        </div>
-        <div className="brand" style={{ marginBottom: 24, justifyContent: "center", width: "100%" }}>
-          <span className="brand__word">
-            Sculpt<span>.</span>
-          </span>
+          <Logo height={52} />
         </div>
         <h1 style={{ marginBottom: 6 }}>Studio sign-in</h1>
         <p className="muted small" style={{ marginBottom: 24 }}>

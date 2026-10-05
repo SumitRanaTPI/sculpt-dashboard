@@ -27,11 +27,8 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="shell">
       <header className="topbar">
         <div className="topbar__inner">
-          <Link href="/" className="brand">
-            <Logo size={32} />
-            <span className="brand__word">
-              Sculpt<span>.</span>
-            </span>
+          <Link href="/" className="brand" aria-label="SCULPT home">
+            <Logo height={26} />
           </Link>
           <nav className="nav" aria-label="Studio">
             {NAV.map((item) => (
