@@ -11,10 +11,20 @@ export interface GarmentListRow {
   garment_type_label: string | null;
   silhouette_label: string | null;
   fabric_label: string | null;
+  season_code?: string | null;
+  gender_code?: string | null;
+  wear_system_code?: string | null;
+  garment_type_code?: string | null;
+  silhouette_code?: string | null;
+  fabric_code?: string | null;
   ornamentation_codes: string[] | null;
   hero_image_url: string | null;
   has_video: boolean;
   created_at: string;
+  barcode?: string | null;
+  needs_review?: boolean;
+  /** Others notes keyed by parameter key. */
+  other_notes?: Record<string, string> | null;
 }
 
 export interface HomeDashboard {
@@ -35,6 +45,7 @@ export interface GarmentComponent {
   type_code: string | null;
   type_label: string | null;
   description: string | null;
+  other_notes?: Record<string, string> | null;
   media_urls: string[] | null;
 }
 
@@ -52,6 +63,7 @@ export interface CustomSelection {
   coding_slot: CodingSlot | null;
   codes: string[];
   labels: string[];
+  other_note?: string | null;
 }
 
 export interface GarmentDetail extends GarmentListRow {

@@ -14,7 +14,13 @@ export function taxonomyLine(g: GarmentListRow): string {
     .join(" · ");
 }
 
-export function GarmentCard({ garment }: { garment: GarmentListRow }) {
+export function GarmentCard({
+  garment,
+  onExport,
+}: {
+  garment: GarmentListRow;
+  onExport?: () => void;
+}) {
   const tax = taxonomyLine(garment);
   const codes = garment.ornamentation_codes ?? [];
   return (
@@ -45,6 +51,19 @@ export function GarmentCard({ garment }: { garment: GarmentListRow }) {
               </span>
             ))}
           </div>
+        ) : null}
+        {onExport ? (
+          <button
+            type="button"
+            className="btn btn--ghost btn--sm gcard__export"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              onExport();
+            }}
+          >
+            Export
+          </button>
         ) : null}
       </div>
     </Link>
