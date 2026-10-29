@@ -9,6 +9,7 @@ import { initialsOf, useProfile } from "@/components/ProfileProvider";
 const NAV = [
   { href: "/", label: "Home" },
   { href: "/garments", label: "Garments" },
+  { href: "/fabrics", label: "Fabrics" },
   { href: "/specs", label: "Specs" },
   { href: "/studio", label: "Studio" },
 ] as const;

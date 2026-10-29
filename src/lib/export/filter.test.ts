@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { GarmentListRow } from "../api/types.ts";
-import { garmentsForExport } from "./filter.ts";
+import type { FabricListRow, GarmentListRow } from "../api/types.ts";
+import { fabricsForExport, garmentsForExport } from "./filter.ts";
 
 function row(overrides: Partial<GarmentListRow>): GarmentListRow {
   return {
@@ -41,6 +41,76 @@ test("date range ignores the search box unless asked", () => {
   const searched = garmentsForExport(garments, range, { applySearch: true, query: "ivory" });
   assert.deepEqual(
     searched.map((garment) => garment.id),
+    ["a"],
+  );
+});
+
+function fabricRow(overrides: Partial<FabricListRow>): FabricListRow {
+  return {
+    id: "f1",
+    human_id: "SCULPT-FAB-COT-001",
+    kind: "fabric",
+    studio_number: "FAB-001",
+    title: "Ivory cotton",
+    description: null,
+    fabric_code: "COT",
+    fabric_label: "Cotton",
+    colour_story_code: "NTR",
+    colour_story_label: "Neutral",
+    embellishment_density_code: "D0",
+    embellishment_density_label: "None",
+    ornamentation_codes: [],
+    ornamentation_labels: [],
+    hero_image_url: null,
+    created_at: "2026-10-05T04:00:00.000Z",
+    quantity_meters: 12.5,
+    ...overrides,
+  };
+}
+
+test("fabric export respects kind filter and search", () => {
+  const fabrics = [
+    fabricRow({ id: "a", title: "Ivory cotton" }),
+    fabricRow({
+      id: "b",
+      kind: "stole",
+      human_id: "SCULPT-STL-SLK-001",
+      studio_number: "STL-001",
+      title: "Silk stole",
+      quantity_meters: null,
+    }),
+    fabricRow({
+      id: "c",
+      title: "Rust linen",
+      studio_number: "FAB-099",
+      created_at: "2026-10-04T04:00:00.000Z",
+    }),
+  ];
+  const dated = fabricsForExport(fabrics, range, {
+    applySearch: false,
+    query: "",
+    kindFilter: "all",
+  });
+  assert.deepEqual(
+    dated.map((row) => row.id),
+    ["a", "b"],
+  );
+  const stoles = fabricsForExport(fabrics, range, {
+    applySearch: false,
+    query: "",
+    kindFilter: "stole",
+  });
+  assert.deepEqual(
+    stoles.map((row) => row.id),
+    ["b"],
+  );
+  const searched = fabricsForExport(fabrics, range, {
+    applySearch: true,
+    query: "ivory",
+    kindFilter: "fabric",
+  });
+  assert.deepEqual(
+    searched.map((row) => row.id),
     ["a"],
   );
 });

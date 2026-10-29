@@ -2,6 +2,9 @@ import { ApiError, get, rpc } from "@/lib/api/client";
 import type {
   CreateParameterPayload,
   CreateParameterResponse,
+  FabricDetail,
+  FabricDetailResponse,
+  FabricListRow,
   GarmentDetail,
   GarmentDetailResponse,
   GarmentListRow,
@@ -13,8 +16,8 @@ import type {
 } from "@/lib/api/types";
 
 export class NotFoundError extends ApiError {
-  constructor() {
-    super("This garment is not in the studio.", 404);
+  constructor(message = "This item is not in the studio.") {
+    super(message, 404);
     this.name = "NotFoundError";
   }
 }
@@ -30,14 +33,41 @@ export function fetchGarmentList(): Promise<GarmentListRow[]> {
 export async function fetchGarmentDetail(id: string): Promise<GarmentDetail> {
   try {
     const res = await rpc<GarmentDetailResponse>("garment_detail", { id });
-    if (!res?.garment) throw new NotFoundError();
+    if (!res?.garment) throw new NotFoundError("This garment is not in the studio.");
     return res.garment;
   } catch (err) {
     if (err instanceof ApiError) {
-      if (err.status === 404) throw new NotFoundError();
-      if (err.status === 400 && /garment not found/i.test(err.detail)) throw new NotFoundError();
+      if (err.status === 404) throw new NotFoundError("This garment is not in the studio.");
+      if (err.status === 400 && /garment not found/i.test(err.detail)) {
+        throw new NotFoundError("This garment is not in the studio.");
+      }
       // PostgREST maps P0002 (no_data_found) to 400 as well; catch it by code.
-      if (err.status === 400 && err.code === "P0002") throw new NotFoundError();
+      if (err.status === 400 && err.code === "P0002") {
+        throw new NotFoundError("This garment is not in the studio.");
+      }
+    }
+    throw err;
+  }
+}
+
+export function fetchFabricList(): Promise<FabricListRow[]> {
+  return get<FabricListRow[]>("/fabric_list?order=created_at.desc");
+}
+
+export async function fetchFabricDetail(id: string): Promise<FabricDetail> {
+  try {
+    const res = await rpc<FabricDetailResponse>("fabric_detail", { id });
+    if (!res?.fabric) throw new NotFoundError("This fabric is not in the studio.");
+    return res.fabric;
+  } catch (err) {
+    if (err instanceof ApiError) {
+      if (err.status === 404) throw new NotFoundError("This fabric is not in the studio.");
+      if (err.status === 400 && /fabric not found/i.test(err.detail)) {
+        throw new NotFoundError("This fabric is not in the studio.");
+      }
+      if (err.status === 400 && err.code === "P0002") {
+        throw new NotFoundError("This fabric is not in the studio.");
+      }
     }
     throw err;
   }

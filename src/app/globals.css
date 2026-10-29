@@ -308,6 +308,54 @@ video {
   border-radius: 999px;
 }
 
+.gcard__kind {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--ink);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--outline);
+}
+
+.gcard__kind--stole {
+  background: var(--gold-soft);
+  border-color: transparent;
+}
+
+.kind-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 20px;
+}
+
+.kind-filter .chip {
+  cursor: pointer;
+  border: 1px solid var(--outline);
+  background: var(--card);
+}
+
+.kind-filter .chip:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.kind-filter__count {
+  margin-left: 6px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.home__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .gcard__body {
   padding: 14px 16px 16px;
   display: flex;

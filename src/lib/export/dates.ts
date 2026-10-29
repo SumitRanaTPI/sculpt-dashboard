@@ -81,3 +81,12 @@ export function garmentFilename(humanId: string, ext: "pdf" | "md"): string {
   const safe = humanId.replace(/[^a-zA-Z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "garment";
   return `sculpt-${safe}.${ext}`;
 }
+
+export function fabricArchiveFilename(range: DateRange, ext: "pdf" | "md"): string {
+  return `sculpt-fabrics-${range.from}_to_${range.to}.${ext}`;
+}
+
+export function fabricFilename(humanId: string, ext: "pdf" | "md"): string {
+  const safe = humanId.replace(/[^a-zA-Z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "fabric";
+  return `sculpt-${safe}.${ext}`;
+}

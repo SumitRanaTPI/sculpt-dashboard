@@ -154,3 +154,48 @@ export interface UpsertOptionResponse {
   reactivated: boolean;
   previous_public_id: string | null;
 }
+
+/** Stock kind on `fabrics.kind` (Amendment K). */
+export type FabricStockKind = "fabric" | "stole";
+
+/** One row of view `fabric_list`. */
+export interface FabricListRow {
+  id: string;
+  human_id: string;
+  /** Defaults to fabric when the column is missing (pre–kind deploy). */
+  kind?: FabricStockKind | string | null;
+  studio_number: string | null;
+  title: string;
+  description: string | null;
+  fabric_code: string | null;
+  fabric_label: string | null;
+  colour_story_code: string | null;
+  colour_story_label: string | null;
+  embellishment_density_code: string | null;
+  embellishment_density_label: string | null;
+  ornamentation_codes: string[] | null;
+  ornamentation_labels: string[] | null;
+  hero_image_url: string | null;
+  created_at: string;
+  /** Meters available; null for stole / older fabric rows. PostgREST may send a string. */
+  quantity_meters?: number | string | null;
+  other_notes?: Record<string, string> | null;
+}
+
+export interface FabricParameterMedia {
+  parameter_key: string;
+  parameter_label: string;
+  image_url: string;
+  public_id?: string | null;
+  caption: string | null;
+  sort_order: number | null;
+}
+
+export interface FabricDetail extends FabricListRow {
+  gallery_urls: string[];
+  parameter_media: FabricParameterMedia[];
+}
+
+export interface FabricDetailResponse {
+  fabric: FabricDetail;
+}

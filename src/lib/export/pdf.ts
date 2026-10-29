@@ -1,5 +1,7 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage, type PDFPage } from "pdf-lib";
-import type { GarmentDetail } from "../api/types.ts";
+import type { FabricDetail, GarmentDetail } from "../api/types.ts";
+import { fabricKindLabel, fabricStockKind } from "../fabricKind.ts";
+import { formatFabricQuantityLabel } from "../formatQuantity.ts";
 import { specGroups, taxonomyRows } from "../taxonomy/rows.ts";
 import { EXPORT_TIME_ZONE, type DateRange } from "./dates.ts";
 
@@ -17,6 +19,11 @@ const HEAD = rgb(0.98, 0.965, 0.945);
 
 export interface ArchiveSection {
   garment: GarmentDetail;
+  partial?: boolean;
+}
+
+export interface FabricArchiveSection {
+  fabric: FabricDetail;
   partial?: boolean;
 }
 
@@ -295,6 +302,19 @@ class Writer {
     this.y = Math.min(this.y, leftEnd);
   }
 
+  /** Standalone hero still for cloth-stock pages (no taxonomy code table). */
+  async drawHero(url: string | null | undefined, maxWidth = 160, maxHeight = 200): Promise<void> {
+    const hero = await loadImage(this.pdf, url);
+    if (!hero) return;
+    const scale = Math.min(maxWidth / hero.width, maxHeight / hero.height, 1);
+    const width = hero.width * scale;
+    const height = hero.height * scale;
+    this.ensure(height + 8);
+    const top = this.y;
+    this.page.drawImage(hero, { x: MARGIN, y: top - height, width, height });
+    this.y = top - height - 8;
+  }
+
   /** Hero on the left, code table on the right, matching the garment page. */
   async codesBesideImage(garment: GarmentDetail): Promise<void> {
     const rows: TableRow[] = taxonomyRows(garment).map((row) => ({
@@ -490,6 +510,114 @@ export async function buildArchivePdf(sections: ArchiveSection[], range: DateRan
       writer.text(`${garment.video_urls.length} ${garment.video_urls.length === 1 ? "video" : "videos"} linked on the garment.`, 8, {
         color: MUTED,
       });
+    }
+    writer.gap(4);
+  }
+
+  return pdf.save();
+}
+
+export async function buildFabricArchivePdf(
+  sections: FabricArchiveSection[],
+  range: DateRange,
+): Promise<Uint8Array> {
+  const pdf = await PDFDocument.create();
+  pdf.setTitle(`SCULPT cloth stock ${range.from} to ${range.to}`);
+  const font = await pdf.embedFont(StandardFonts.Helvetica);
+  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const writer = new Writer(pdf, font, bold);
+  const full = PAGE_WIDTH - MARGIN * 2;
+
+  writer.text("SCULPT cloth stock", 16, { bold: true });
+  writer.text(`${range.from} to ${range.to}  ·  ${EXPORT_TIME_ZONE}`, 9, { color: MUTED });
+  writer.text(`${sections.length} ${sections.length === 1 ? "item" : "items"}`, 10);
+  writer.gap(6);
+
+  for (const section of sections) {
+    const fabric = section.fabric;
+    const kind = fabricStockKind(fabric);
+    const kindLabel = fabricKindLabel(kind);
+    const quantity = formatFabricQuantityLabel(fabric.quantity_meters);
+    writer.continueGarment();
+    writer.text(
+      `${fabric.title.trim() || "Untitled"}   ${kindLabel}`,
+      14,
+      { bold: true },
+    );
+    if (section.partial) {
+      writer.text("Full detail could not be loaded. This section uses the list row.", 8, {
+        color: rgb(0.55, 0.3, 0.2),
+      });
+    }
+    writer.gap(4);
+    await writer.drawHero(fabric.hero_image_url);
+
+    writer.heading("Details");
+    const detailRows: Array<[string, string]> = [
+      ["Catalogue ID", fabric.human_id],
+      ["Studio number", plain(fabric.studio_number)],
+      ["Kind", kindLabel],
+    ];
+    if (kind === "fabric") detailRows.push(["Quantity", quantity ?? "—"]);
+    detailRows.push(["Description", plain(fabric.description, "No description.")]);
+    writer.table(
+      detailRows.map(([label, value]) => ({ kind: "body" as const, cells: [label, value] })),
+      [120, full - 120],
+    );
+
+    const ornamentation =
+      (fabric.ornamentation_labels ?? []).filter(Boolean).join(", ") ||
+      (fabric.ornamentation_codes ?? []).join(", ") ||
+      "-";
+    writer.heading("LOOK Specs");
+    writer.table(
+      [
+        { kind: "head", cells: ["Spec", "Selection", "Code"] },
+        {
+          kind: "body",
+          cells: ["Cloth", plain(fabric.fabric_label), plain(fabric.fabric_code)],
+        },
+        {
+          kind: "body",
+          cells: ["Colour family", plain(fabric.colour_story_label), plain(fabric.colour_story_code)],
+        },
+        {
+          kind: "body",
+          cells: [
+            "Work density",
+            plain(fabric.embellishment_density_label),
+            plain(fabric.embellishment_density_code),
+          ],
+        },
+        {
+          kind: "body",
+          cells: [
+            "Ornamentation",
+            ornamentation,
+            (fabric.ornamentation_codes ?? []).join(", ") || "-",
+          ],
+        },
+      ],
+      [130, full - 250, 120],
+    );
+
+    const review = Object.entries(fabric.other_notes ?? {}).filter(([, note]) => note.trim());
+    if (review.length) {
+      writer.heading("Others notes");
+      for (const [key, note] of review) writer.text(`${key}: ${note.trim()}`, 9);
+    }
+
+    const photos = [
+      ...fabric.gallery_urls
+        .filter((url) => url && url !== fabric.hero_image_url)
+        .map((url) => ({ url, caption: "" })),
+      ...fabric.parameter_media
+        .filter((media) => media.image_url)
+        .map((media) => ({ url: media.image_url, caption: media.parameter_label })),
+    ];
+    if (photos.length) {
+      writer.heading("Photos");
+      await writer.photoGrid(photos);
     }
     writer.gap(4);
   }

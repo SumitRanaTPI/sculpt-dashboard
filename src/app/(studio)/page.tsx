@@ -38,9 +38,14 @@ export default function HomePage() {
           <div className="eyebrow">{data?.date_label || "Studio"}</div>
           <h1>{data?.studio_label || "Home"}</h1>
         </div>
-        <Link href="/garments" className="btn btn--ghost btn--sm">
-          All garments
-        </Link>
+        <div className="home__links">
+          <Link href="/garments" className="btn btn--ghost btn--sm">
+            All garments
+          </Link>
+          <Link href="/fabrics" className="btn btn--ghost btn--sm">
+            Cloth stock
+          </Link>
+        </div>
       </div>
 
       <section className="grid grid--stats" aria-label="Studio stats">

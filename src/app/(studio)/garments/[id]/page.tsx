@@ -146,6 +146,32 @@ export default function GarmentDetailPage() {
         </table>
       </section>
 
+      {g.needs_review ||
+      Object.values(g.other_notes ?? {}).some((note) => note.trim().length > 0) ? (
+        <section className="detail__section" aria-label="Needs review">
+          <h2>Needs review</h2>
+          {g.needs_review ? (
+            <p className="small">Marked for review on the phone.</p>
+          ) : null}
+          {Object.entries(g.other_notes ?? {}).filter(([, note]) => note.trim()).length === 0 ? (
+            <p className="muted small">No Others notes.</p>
+          ) : (
+            <table className="data">
+              <tbody>
+                {Object.entries(g.other_notes ?? {})
+                  .filter(([, note]) => note.trim())
+                  .map(([key, note]) => (
+                    <tr key={key}>
+                      <th scope="row">{key}</th>
+                      <td>{note.trim()}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          )}
+        </section>
+      ) : null}
+
       <section className="detail__section" aria-label="Specs">
         <h2>Specs</h2>
         {groups.length === 0 ? (
